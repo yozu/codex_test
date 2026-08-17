@@ -26,7 +26,8 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y ffmpeg
-          python -m pip install --disable-pip-version-check "basic-pitch==0.4.0"
+          python -m pip install --disable-pip-version-check "numpy<2" "basic-pitch==0.4.0"
+          python -m pip install --disable-pip-version-check --force-reinstall "numpy<2"
 
       - name: Transcribe official previews
         run: python scripts/transcribe_official_metro.py
