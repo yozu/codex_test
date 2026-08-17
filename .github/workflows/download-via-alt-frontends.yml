@@ -1,0 +1,37 @@
+name: Download station references via alternate frontends
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "scripts/download_via_alt_frontends.py"
+      - ".github/workflows/download-via-alt-frontends.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  download:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: python -m pip install --disable-pip-version-check requests
+
+      - name: Download reference candidates
+        run: python scripts/download_via_alt_frontends.py
+
+      - name: Upload references
+        uses: actions/upload-artifact@v4
+        with:
+          name: station-reference-audio-alt
+          path: alt-out
+          if-no-files-found: error
+          retention-days: 1
