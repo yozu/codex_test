@@ -1,0 +1,33 @@
+name: Transcribe direct station references
+on:
+  push:
+    branches: [main]
+    paths:
+      - scripts/transcribe_direct_refs.py
+      - .github/workflows/transcribe-direct-refs.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  transcribe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - name: Install tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg
+          python -m pip install --disable-pip-version-check 'numpy<2' 'basic-pitch==0.4.0'
+          python -m pip install --disable-pip-version-check --force-reinstall 'numpy<2'
+      - name: Transcribe
+        run: python scripts/transcribe_direct_refs.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: direct-reference-basic-pitch
+          path: direct-transcribe-out
+          if-no-files-found: error
+          retention-days: 1
